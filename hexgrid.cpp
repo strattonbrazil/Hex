@@ -30,7 +30,8 @@ void HexGrid::createNeighbors()
             Hex* hex = _grid[row][column];
             if (row != 0) {
                 hex->setNorth(_grid[row-1][column]);
-            } else if (row != _height - 1) {
+            }
+            if (row != _height - 1) {
                 hex->setSouth(_grid[row + 1][column]);
             }
 
@@ -45,7 +46,8 @@ void HexGrid::createNeighbors()
                         hex->setNorthwest(_grid[row - 1][column - 1]);
                     hex->setSouthwest(_grid[row][column - 1]);
                 }
-            } else if (column != _width - 1) { // make east connections
+            }
+            if (column != _width - 1) { // make east connections
                 if (lowered) {
                     hex->setNortheast(_grid[row][column + 1]);
                     if (row != _height - 1)
@@ -60,8 +62,43 @@ void HexGrid::createNeighbors()
     }
 }
 
+#include <iostream>
+
 QLinkedList<Hex*> HexGrid::findPath(QPoint startP, QPoint endP)
 {
     Hex* start = _grid[startP.x()][startP.y()];
-    Hex* end = _grid[endP.y()][endP.y()];
+    Hex* end = _grid[endP.x()][endP.y()];
+
+    // reset distances
+    for (int row = 0; row < _height; row++) {
+        for (int column = 0; column < _width; column++) {
+            _grid[row][column]->setDistance(-1);
+        }
+    }
+
+    end->traverseTo(start, 0);
+
+    // build the path
+    QLinkedList<Hex*> path;
+    while (start != end) {
+        Hex* lowestNeighbor = 0;
+
+        // find closest lowest distance and step to it
+        for (int i = 0; i < 6; i++) {
+            Hex* neighbor = start->neighbor(i);
+            if (neighbor) {
+                if (!lowestNeighbor) { // make this one the closest neighbor
+                    lowestNeighbor = neighbor;
+                } else if (lowestNeighbor->distance() > neighbor->distance()) {
+                    lowestNeighbor = neighbor;
+                }
+            }
+        }
+
+        // step in the closest direction
+        start = lowestNeighbor;
+        path.append(start);
+    }
+
+    return path;
 }

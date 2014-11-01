@@ -61,8 +61,6 @@ void Canvas::paintEvent(QPaintEvent *event)
         painter.drawImage(getHexOverlayTarget(_targetHex->row(), _targetHex->column()), playerTargetImage);
     }
 
-    //painter.setPen(QColor(255,255,255));
-    //painter.setBrush(QBrush(QColor(255,255,255)));
     //painter.drawText(20, height() - 100, "Timer: ");
 
     // draw countdown
@@ -84,6 +82,13 @@ void Canvas::renderGrid(QPainter &painter)
                 painter.drawImage(target, greenHexImage);
             else
                 painter.drawImage(target, hexImage);
+
+
+            painter.setPen(QColor(255,255,255));
+            painter.setBrush(QBrush(QColor(255,255,255)));
+            QString f;
+            f.setNum(hex->distance());
+            painter.drawText(target.x() + 0.5*target.width(), target.y() + 0.5*target.height(), f);
         }
     }
 }
@@ -157,7 +162,25 @@ void Canvas::advance()
 void Canvas::updateLogic()
 {
     if (hasPulseUpdate()) {
-        // pulse
+        // move ogre
+        QLinkedList<Hex*> ogrePath = _grid->findPath(_ogreP, _playerP);
+        _ogreP.setX(ogrePath.first()->row());
+        _ogreP.setY(ogrePath.first()->column());
+
+        // move player
+        if (_targetHex) {
+            QPoint targetP(_targetHex->row(), _targetHex->column());
+            QLinkedList<Hex*> playerPath = _grid->findPath(_playerP, targetP);
+
+            if (playerPath.size() >= 2)
+                playerPath.pop_front();
+
+            if (playerPath.size() > 0) {
+                _playerP.setX(playerPath.first()->row());
+                _playerP.setY(playerPath.first()->column());
+            }
+
+        }
     }
 }
 

@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/resource">
+        <file>assets/hex.png</file>
+        <file>assets/hex_no_alpha.png</file>
+        <file>assets/pie.png</file>
+        <file>assets/ogre.png</file>
+        <file>assets/knight.png</file>
+        <file>assets/hex_green_border.png</file>
+        <file>assets/knight_transparent.png</file>
+    </qresource>
+</RCC>
